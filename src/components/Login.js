@@ -7,6 +7,7 @@ import { Visibility, VisibilityOff } from '@material-ui/icons';
 import theme from './../Themes';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import { withStyles, } from '@material-ui/core/styles';
+import firebaseConfig from './../config/FirebaseConfig';
 
 const styles = theme => ({
     container: {
@@ -48,10 +49,17 @@ const styles = theme => ({
 
 
 class Login extends Component {
-    state = {
-        password: '',
-        showPassword: false,
-    };
+    constructor(props) {
+        super(props);
+        this.login = this.login.bind(this);
+        this.state = {
+            email: '',
+            password: '',
+            showPassword: false,
+        };
+
+    }
+
 
     handleChange = prop => event => {
         this.setState({ [prop]: event.target.value });
@@ -61,50 +69,66 @@ class Login extends Component {
         this.setState(state => ({ showPassword: !state.showPassword }));
     };
 
+    login(event) {
+        event.preventDefault();
+
+        firebaseConfig.auth().signInWithEmailAndPassword(this.state.email, this.state.password).then((u) => {
+        }).catch((error) => {
+            alert("Mal " + error + " " + this.state.email);
+        });
+    }
+
+
     render() {
         const { classes } = this.props;
 
         return (
             <div className={classes.container}>
                 <Paper>
-                <MuiThemeProvider theme={theme}>
-                    <form>
-                        <Button variant='contained' color='primary' className={classes.button}>Google</Button>
-                        <Divider className={classes.margin} />
+                    <MuiThemeProvider theme={theme}>
+                        <form>
+                            <Button variant='contained' color='primary' className={classes.button}>Google</Button>
+                            <Divider className={classes.margin} />
 
-                        <TextField
-                            id="outlined-email-input"
-                            label="Email"
-                            className={classes.textField}
-                            type="email"
-                            name="email"
-                            autoComplete="email"
-                        />
-
-                        <FormControl className={classes.textField}>
-                            <InputLabel htmlFor="adornment-password">Password</InputLabel>
-                            <Input
-                                id="adornment-password"
-                                type={this.state.showPassword ? 'text' : 'password'}
-                                value={this.state.password}
-                                onChange={this.handleChange('password')}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="Toggle password visibility"
-                                            onClick={this.handleClickShowPassword}
-                                        >
-                                            {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
+                            <TextField
+                                id="outlined-email-input"
+                                label="Email"
+                                className={classes.textField}
+                                value={this.state.email}
+                                onChange={this.handleChange('email')}
+                                type="email"
+                                name="email"
+                                autoComplete="email"
                             />
-                        </FormControl>
 
-                        <Button variant='contained' color='primary' className={classes.button}>
-                            Ingresar
+                            <FormControl className={classes.textField}>
+                                <InputLabel htmlFor="adornment-password">Password</InputLabel>
+                                <Input
+                                    id="adornment-password"
+                                    type={this.state.showPassword ? 'text' : 'password'}
+                                    value={this.state.password}
+                                    onChange={this.handleChange('password')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="Toggle password visibility"
+                                                onClick={this.handleClickShowPassword}
+                                            >
+                                                {this.state.showPassword ? <Visibility /> : <VisibilityOff />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+
+                            <Button variant='contained'
+                                color='primary'
+                                className={classes.button}
+                                onClick={this.login}
+                            >
+                                Ingresar
                             </Button>
-                    </form>
+                        </form>
                     </MuiThemeProvider>
 
                 </Paper>
